@@ -1,18 +1,38 @@
-﻿#include "header.h"
+#include "header.h"
+
+void sort_array(int array[], int size) {
+	int temp = 0;
+	for (int i = 0; i < (size - 1); i++) {
+		for (int j = 0; j < (size - i - 1); j++) {
+			if (array[j] > array[j + 1]) {
+				temp = array[j];
+				array[j] = array[j + 1];
+				array[j + 1] = temp;
+			}
+		}
+	}
+}
 
 //function name: void roll_dice(int* dice, int size)
 //description: generates random values for dice rolls, each value is stored in an array
 //input parameters: address for the dice array, size of the array
 //output: random dice rolls stored in the array
 
-void roll_dice(int* die_values)
+void roll_dice(int die_values[], int size)
 {
-	for (int index = 0; index < 6; ++index) 
-	{
-		die_values[index] = rand() % 6 + 1;
-		//don't need to return value, because arrays are pointers
+
+	for (int i = 0; i < size; i++) {
+		int num = 0;
+		num = rand() % 6 + 1;
+		die_values[i] = num;
 	}
+	//for (int i = 0; i < size; i++)
+	//{
+	//	die_values[i] = rand() % 6 + 1;
+	//	//don't need to return value, because arrays are pointers
+	//}
 }
+
 
 //function name:void display_rules(void)
 //description: displays the rules to the console
@@ -26,7 +46,7 @@ void display_rules(void) {
 	printf("You can reroll any chosen dice a total of 3 times\n");
 	printf("After that, you will be prompted to choose one of seven scoring combinations\n");
 	printf("Both players will take a total of 13 turns, the player with the highest sum wins! \n");
-	printf("Without further ado, lets play!\n\n"); 
+	printf("Without further ado, lets play!\n\n");
 }
 
 //function name : int determine_user_choice(void)
@@ -50,26 +70,29 @@ int determine_user_choice(void) {
 void yahtzee_gameplay(void) {
 
 	int rounds = 0;
-	int player_1_rolls[7] = {0};
-	int player2_rolls[7] = {0};
+	int player_1_rolls[6] = { 0 };
+	int player2_rolls[6] = { 0 };
 
-	int die_values[6] = {0}; //dice rolls for each roll
-	int num_die_values[7] = { 0 }; //stores each roll in an array, allows user to change rolls by assigning an index value for each dice value
+	int die_values[6] = { 0 }; //dice rolls for each roll
+	int num_die_values[6] = { 0 }; //stores each roll in an array, allows user to change rolls by assigning an index value for each dice value
 
 
 	rounds = 1;
 	while (rounds <= 13) {
 
+		printf("ROUND %d\n", rounds);
 		printf("It is player 1's turn: \n");
-		roll_again(die_values);
-		prompt_roll_again(die_values);
+		roll_and_check(die_values);
+		//function to organize values by frequency
+		// 
+		//function to choose and validate score type
 
-
+		printf("It is player 2's turn: \n");
 		
 
 		++rounds;
 	}
-	
+
 	return;
 }
 
@@ -82,7 +105,7 @@ void print_dice(int die_values[], int counter) {
 
 	printf("Roll %d \n", counter);
 
-	for (int i = 1; i < 6; ++i) {
+	for (int i = 0; i < 5; ++i) {
 		printf("%d", die_values[i]);
 	}
 	printf("\n");
@@ -91,7 +114,7 @@ void print_dice(int die_values[], int counter) {
 
 void prompt_roll_again(char* go_again_ptr) {
 	char wanna_roll = '\0';
-	printf("Want to roll again? [Y/N]: ");
+	printf("Want to reroll any dice? (Enter 'Y' for yes and 'N' for no: ");
 	scanf(" %c", &wanna_roll);
 	if (wanna_roll == 'y' || wanna_roll == 'Y') {
 		*go_again_ptr = 'Y';
@@ -101,203 +124,107 @@ void prompt_roll_again(char* go_again_ptr) {
 	}
 }
 
-	void roll_again(int die_values[]) {
-		//Variables initialized
-		int i1 = 0, i2 = 0, i3 = 0, i4 = 0, i5 = 0, how_many = 0, counter = 1;
-		char wanna_roll_again = '\0';
+void roll_and_check(int die_values[]) {
+	//Variables initialized
+	int i1 = 0, i2 = 0, i3 = 0, i4 = 0, i5 = 0, how_many = 0, counter = 1;
+	char wanna_roll_again = '\0';
 
-		//Die rolled and printed (first roll); User prompted to roll again
-		roll_dice(die_values);
-		print_dice(die_values, counter);
-		prompt_roll_again(&wanna_roll_again);
+	//Die rolled and printed (first roll); User prompted to roll again
+	roll_dice(die_values, 5);
+	print_dice(die_values, counter);
+	prompt_roll_again(&wanna_roll_again);
+
+	//Second and third roll (if necessary)
+	do {
+		if (wanna_roll_again == '\0') {
+			break;
+		}
+		//Prompts for how many die should be kept
+		do {
+			printf("How many do you want to keep? ");
+			scanf("%d",&how_many);
+		} while (how_many < 0 || how_many > 5);
+
 		counter += 1;
 
-		//Second and third roll (if necessary)
-		do {
-			if (wanna_roll_again == '\0') {
-				break;
+		//Prompts for which ones should be kept; re-rolls the others
+		switch (how_many) {
+		case 0: roll_dice(die_values, 5);
+			break;
+
+		case 1: printf("Which one do you want to keep? (1-5, left to right):");     //Add while loops to make the user enter valid numbers
+			scanf("%d",&i1);
+			i1 = i1 - 1; //subtract 1 to consider the first address value of the array is 0 not 1
+			for (int i = 0; i < 5; i++) {
+				if (i == i1) {
+					continue;
+				}
+				else {
+					die_values[i] = rand() % 6 + 1;
+				}
 			}
-			//Prompts for how many die should be kept
-			do {
-				printf("How many do you want to keep? ");
-				scanf("%d", &how_many);
-			} while (how_many < 0 || how_many > 5);
+			break;
 
-			//Prompts for which ones should be kept; re-rolls the others
-			switch (how_many) {
-			case 0: roll_dice(die_values);
-				break;
+		case 2: printf("Which ones do you want to keep? (1-5, left to right, press enter after each input):\n");
+			scanf("%d%d",&i1,&i2);
 
-			case 1: printf("Which one do you want to keep? (1-5, left to right): ");     //Add while loops to make the user enter valid numbers
-				scanf("%d", &i1);
-				for (int i = 1; i < 6; i++) {
-					if (i == i1) {
-						continue;
-					}
-					else {
-						die_values[i] = rand() % 6 + 1;
-					}
+			i1 = i1 - 1; //subtract 1 from each to consider the first address value of the array is 0 not 1
+			i2 = i2 - 1;
+
+			for (int i = 1; i < 6; i++) { 
+				if (i == i1) {
+					continue;
 				}
-				break;
-
-			case 2: printf("Which ones do you want to keep? (1-5, left to right): ");
-				scanf("%d%d", &i1, &i2);
-				for (int i = 1; i < 6; i++) {
-					if (i == i1 || i == i2) {
-						continue;
-					}
-					else {
-						die_values[i] = rand() % 6 + 1;
-					}
+				if (i == i2) {
+					continue;
 				}
-				break;
-
-			case 3: printf("Which ones do you want to keep? (1-5, left to right): ");
-				scanf("%d%d%d", &i1, &i2, &i3);
-				for (int i = 1; i < 6; i++) {
-					if (i == i1 || i == i2 || i == i3) {
-						continue;
-					}
-					else {
-						die_values[i] = rand() % 6 + 1;
-					}
+				else {
+					die_values[i] = rand() % 6 + 1;
 				}
-				break;
-
-			case 4: printf("Which ones do you want to keep? (1-5, left to right): ");
-				scanf("%d%d%d%d", &i1, &i2, &i3, &i4);
-				for (int i = 1; i < 6; i++) {
-					if (i == i1 || i == i2 || i == i3 || i == i4) {
-						continue;
-					}
-					else {
-						die_values[i] = rand() % 6 + 1;
-					}
-				}
-				break;
-
-			case 5: break;
-
 			}
-			//Prints the die, prompts for a 3rd roll
-			printf("Here's your reroll bitch: ");
-			print_dice(die_values, counter); //counter 
-			if (counter < 3) {
-				prompt_roll_again(&wanna_roll_again);
+			break;
+
+		case 3: printf("Which ones do you want to keep? (1-5, left to right, press enter after each input):\n");
+			scanf("%d%d%d",&i1,&i2,&i3);
+			i1 = i1 - 1;
+			i2 = i2 - 1;
+			i3 = i3 - 1;
+			for (int i = 1; i < 6; i++) {
+				if (i == i1 || i == i2 || i == i3) {
+					continue;
+				}
+				else {
+					die_values[i] = rand() % 6 + 1;
+				}
 			}
-			counter += 1;
-		} while (wanna_roll_again == 'Y' && counter <= 3);
+			break;
 
-	}
+		case 4: printf("Which ones do you want to keep? (1-5, left to right, press enter after each input):\n");
+			scanf("%d%d%d%d",&i1,&i2,&i3,&i4);
+				i1 = i1 - 1;
+				i2 = i2 - 1; 
+				i3 = i3 - 1;
+				i4 = i4 - 1;
 
+			for (int i = 1; i < 6; i++) {
+				if (i == i1 || i == i2 || i == i3 || i == i4) {
+					continue;
+				}
+				else {
+					die_values[i] = rand() % 6 + 1;
+				}
+			}
+			break;
 
-	//function name : void roll_again(int die_values[])
-//description : asks the user if they want to reroll any of their dice, max of 3 times
-//input parameters : random dice roll values
-//output : rerolls chosen dice and prints to console
-//
-//void roll_again(int die_values[]) {
-//	int rerolls = 0;
-//	char choice = '\0';
-//	int i1=0, i2=0, i3=0, i4=0, i5=0, i6=0; //integer corresponding to each dice value in the array, allows for rerolling 
-//
-//	printf("do you want to reroll any dice?, enter 'Y' for yes and 'N' for no: \n"); //ADD CASE FUNCTION
-//	scanf(" %c", &choice);
-//	printf("choice = %c", choice);
-//
-//	do { //3
-//
-//		if (choice == 'Y') {
-//			//function to choose which dice to reroll
-//			printf("we do be rerolling XD\n"); 
-//			int how_many = 0;
-//
-//			printf("So how many dice do you want to reroll?\n");
-//			scanf("%d", &how_many);
-//
-//			switch (how_many) {
-//			case 0:
-//				break;
-//			case 1:
-//				printf("Which dice do you want to keep?\n");
-//				scanf("%d", &i1);
-//				for (int i = 1; i < 6; ++i) {
-//					if (i == i1) {
-//						continue; //retains original values
-//					}
-//					else {
-//						die_values[i] = rand() % 6 + 1; //rolls values that player doesn't want to keep
-//					}
-//				}
-//				break;
-//			case 2:
-//				printf("Which dice do you want to keep?\n");
-//				scanf("%d%d", &i1, &i2);
-//
-//				for (int i = 1; i < 6; ++i) { //applies user input to the coresponding dice value in sequence
-//					if (i == i1 || i == i2) { //retains original values
-//						continue;
-//					}
-//					else {
-//						die_values[i] = rand() % 6 + 1;
-//					}
-//				}
-//				break;
-//
-//			case 3:
-//				printf("Which dice do you want to keep?\n");
-//				scanf("%d%d%d", &i1, &i2, &i3);
-//
-//				for (int i = 1; i < 6; ++i) { //applies user input to the coresponding dice value in sequence
-//					if (i == i1 || i == i2 || i == i3) { //retains original values
-//						continue;
-//					}
-//					else {
-//						die_values[i] = rand() % 6 + 1;
-//					}
-//				}
-//				break;
-//
-//			case 4:
-//				printf("Which die do you want to keep?\n");
-//				scanf("%d%d%d%d", &i1, &i2, &i3, &i4);
-//
-//				for (int i = 1; i < 6; ++i) { //applies user input to the coresponding dice value in sequence
-//					if (i == i1 || i == i2 || i == i3 || i == i4) { //retains original values
-//						continue;
-//					}
-//					else {
-//						die_values[i] = rand() % 6 + 1;
-//					}
-//				}
-//				break;
-//			case 5: break; 
-//
-//			}
-//
-//			print_dice(die_values);
-//
-//			//printf("Your new roll looks like: ");
-//			//for (int i = 1; i < 6; ++i) {
-//			//	printf("%d", die_values[i]);
-//			//}
-//				
-//				//reroll function
-//				rerolls++;
-//
-//
-//		}
-//
-//	} while (rerolls < 3 || choice == 'Y');
-//
-//
-//		if (choice == 'N') {
-//			printf("fine, keep your dice ig... \n");
-//			return;
-//		}
-//		if (choice != 'N' && choice != 'Y') {
-//			printf("Invalid option...\n");
-//		}
-//
-//		
-//	}
+		case 5: break;
+
+		}
+		//Prints the die, prompts for a 3rd roll
+		print_dice(die_values, counter);
+		if (counter < 3) {
+			prompt_roll_again(&wanna_roll_again);
+		}
+		
+	} while (wanna_roll_again == 'Y' && counter < 3);
+
+}
