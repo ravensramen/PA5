@@ -1,4 +1,3 @@
-
 //Preprocessor directives that prevent superfluous warnings with functions like scanf
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_DEPRECATE
@@ -11,12 +10,14 @@
 
 //FUNCTION DEFINITIONS
 
+void sort_array(int array[], int size);
+
 //function name: void roll_dice(int* dice, int size)
 //description: generates random values for dice rolls, each value is stored in an array
 //input parameters: address for the dice array, size of the array
 //output: random dice rolls stored in the array
 
-void roll_dice(int* dice);
+void roll_dice(int dice [], int size);
 
 //function name:void display_rules(void)
 //description: displays the rules to the console
@@ -39,12 +40,12 @@ int determine_user_choice(void);
 
 void yahtzee_gameplay(void);
 
-//function name : void print_dice(int die_values[]);
+//function name : void print_dice(int die_values[], int counter);
 //description : prints each roll value to the console. 
 //input parameters : address of the dice roll array, count of round
 //output : none
 
-void print_dice(int die_values[]);
+void print_dice(int die_values[], int counter);
 
 
 //function name : void roll_again(int die_values[]);
@@ -52,14 +53,12 @@ void print_dice(int die_values[]);
 //input parameters : dice values (only neccessary to be sent to the rerolling function upon chosing to reroll. 
 //output : none
 
-void roll_again(int die_values[]);
+void roll_and_check(int die_values[]);
 
 //function name : void reroll_dice(int die_values[]);
 //description : asks the player how many dice they want to reroll, which ones
 //input parameters : dice values in array, requires user to have entered 'Y' on roll_again function. 
 //output : none, reassigns new dice rolls. 
 
-void reroll_dice(int die_values[]);
-//void store_dice(int die_values, int num_die_values);
 
 void prompt_roll_again(char* go_again_ptr);
