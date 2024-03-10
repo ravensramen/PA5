@@ -7,7 +7,7 @@ int main(void) {
 
 	printf("Welcome to the Yahtzee!\n\n");
 	do {
-		
+
 		user_choice = determine_user_choice();
 
 		switch (user_choice) {
@@ -23,5 +23,5 @@ int main(void) {
 		//system('cls')
 	} while (user_choice != 3);
 
-		return 0;
+	return 0;
 }
